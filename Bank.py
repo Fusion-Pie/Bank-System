@@ -13,7 +13,7 @@ bank_cur = bank_db.cursor()                                                     
 
 
 class Bank:
-    bank_name = "Pie Bank Of India" #not of use
+    bank_name = "Pie Bank Of India" 
     
     def CreateUser(self):                                                      #Create New User
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
