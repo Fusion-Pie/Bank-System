@@ -2,6 +2,7 @@ import string as s
 import random as ran
 import datetime as dt
 import mysql.connector as myconn
+import pandas as pd
 
 bank_db = myconn.connect (                                                      #Connecting Database 
         host="localhost",
@@ -92,6 +93,13 @@ class Bank:
     
     def Deposit(self,p):                                                       #Adds Money to account
         self.dep_amount = int(input("Please enter the amount to deposit: "))
+
+        query ="Select User_id from Bank_Users where pin = %s"
+        val = (p,)
+
+        bank_cur.execute(query,val)
+
+        result = bank_cur.fetchall()
         
         query = "Update Bank_Users set Balance = Balance + %s where Pin = %s"
         val = (self.dep_amount,p)
@@ -100,8 +108,14 @@ class Bank:
         
         query = "Update Bank_Users set Balance = Balance + %s where User_id = 1"
         val = (self.dep_amount,)
+
+        bank_cur.execute(query,val)
         
         bank_db.commit()
+
+        date_now = str(dt.datetime.now()).split()[0]
+
+        user.TransactionHistoryFeeder(result[0][0],self.dep_amount,'cr',date_now)
         
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
         print(f"\n{self.dep_amount} Rs Deposited Successfully")
@@ -111,7 +125,7 @@ class Bank:
     def WithDraw(self,p):                                                      #Deducts money from account
         self.with_amount = int(input("\nPlease enter the amount you want to withdraw: "))
         
-        query = "Select Balance,First_Name from Bank_Users where Pin = %s"
+        query = "Select Balance,First_Name,User_id from Bank_Users where Pin = %s"
         val = (p,)
         
         bank_cur.execute(query,val)
@@ -125,6 +139,11 @@ class Bank:
             bank_cur.execute(query,val)
             
             bank_db.commit()
+
+            date = str(dt.datetime.now()).split()[0]
+
+            user.TransactionHistoryFeeder(result[0][2],self.with_amount,'d')
+
             
             print(f"\nHi! {result[0][1]}")
             print("\nMoney Withdarwn Successfully")
@@ -479,7 +498,38 @@ class Bank:
                 bank_db.commit()
         else:
             pass
+
+    def TransactionHistoryFeeder(self,id,trans,trans_status,date):
         
+        query = "Insert into trans_history (User_id ,transaction ,trans_status, date) Values(%s,%s,%s,%s)"
+        val = (id ,trans ,trans_status ,date)
+
+        bank_cur.execute(query,val)
+
+        bank_db.commit()
+
+    def TransactionHistoryShower(self,pin):
+
+        query = "Select User_id from Bank_Users where Pin = %s"
+        val = (pin,)
+        
+        bank_cur.execute(query,val)
+        
+        result = bank_cur.fetchall()
+        
+        query2 = "Select Transaction, trans_status, date from trans_history where User_id = %s"
+        val2 = (result[0][0],)
+
+        bank_cur.execute(query2,val2)
+
+        res = bank_cur.fetchall()
+
+        for i in res:
+            print(i)
+
+        # Use pandas to show the result
+        
+
         
 user = Bank()
 
@@ -509,7 +559,7 @@ while(res == 'y'):
     elif user_res == '2':
         print("\nServices: ")
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
-        print("\n1.Check Balance \n2.Deposite \n3.Withdaraw \n4.Pin Change ")
+        print("\n1.Check Balance \n2.Deposite \n3.Withdaraw \n4.Pin Change \n5.Transaction History")
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
         
         user_res1 = int(input("\nPlease Select Service: "))
@@ -530,6 +580,10 @@ while(res == 'y'):
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.PinChange(pin)
+        elif user_res1 == 5:
+            print("\n-------------------------------------------------------------------------------------------------------------------------------")
+            pin = input("\nPlease enter pin: ")
+            user.TransactionHistoryShower(pin)
         else:
             print("\nIncorect Response ----- Please try again -------- Thank you!")
     
