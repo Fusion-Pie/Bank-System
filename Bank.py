@@ -142,7 +142,7 @@ class Bank:
 
             date = str(dt.datetime.now()).split()[0]
 
-            user.TransactionHistoryFeeder(result[0][2],self.with_amount,'d')
+            user.TransactionHistoryFeeder(result[0][2],self.with_amount,'d',date)
 
             
             print(f"\nHi! {result[0][1]}")
@@ -501,7 +501,7 @@ class Bank:
 
     def TransactionHistoryFeeder(self,id,trans,trans_status,date):
         
-        query = "Insert into trans_history (User_id ,transaction ,trans_status, date) Values(%s,%s,%s,%s)"
+        query = "Insert into trans_history (User_id ,transaction ,trans_status, Date) Values(%s,%s,%s,%s)"
         val = (id ,trans ,trans_status ,date)
 
         bank_cur.execute(query,val)
@@ -524,12 +524,15 @@ class Bank:
 
         res = bank_cur.fetchall()
 
-        for i in res:
-            print(i)
+        columns = ['Transaction','Transaction_Status','Date_of_Transaction']  
 
-        # Use pandas to show the result
-        
+        df = pd.DataFrame(res ,columns = columns)
 
+        print("\n-------------------------------------------------------------------------------------------------------------------------------\n")
+
+        print(df)
+
+  
         
 user = Bank()
 
