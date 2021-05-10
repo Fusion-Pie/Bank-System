@@ -45,6 +45,15 @@ class Bank:
         
             bank_cur.execute(query , val)
             bank_db.commit()
+
+            query = "Select User_id from Bank_Users where Pin = %s"
+            val = (self.pin,)
+
+            bank_cur.execute(query,val)
+
+            result = bank_cur.fetchall()
+
+            user.TransactionHistoryFeeder(result[0][0],self.deposit_amount,'ac',self.dt[0])
             
         
             print("\n\n-------------------------------------------------------------------------------------------------------------------------------")
@@ -213,7 +222,7 @@ class Bank:
             self.loan_duration = int(input("\nPlease enter the no. of months in which you want repay the money: "))
             
             i = 5                                                    #interest(%)
-            r = round(i/12/100,5)
+            r = round(i/12/100,5)                                    #interest rate per month
             
             EMI = round(self.loan_amount * r * (1+r)**self.loan_duration / ((1+r)**self.loan_duration - 1))
             repay_amount = round(EMI * self.loan_duration)
@@ -266,8 +275,9 @@ class Bank:
                     bank_cur.execute(query,val)
                     
                     bank_db.commit()
-                    
-                    
+
+                    user.TransactionHistoryFeeder(result_id,repay_amount,'la',date)
+                                   
                     
                     print("\nCongratulations! Loan Amount Successfully added to your account")
                     print("\nThank you! for choosing us, Please pay your loan on time to avoid additional penalty charges")
@@ -304,18 +314,17 @@ class Bank:
                         result_id = bank_cur.fetchall()
                         result_id = result_id[0][0]
                     
-                        date = dt.datetime.now()
-                        date = str(date).split()
-                        date = date[0]
+                        date = str(dt.datetime.now()).split()[0]
                     
                         query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period) Values (%s,%s,%s,%s,%s,%s)"
                         val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration)
                     
                         bank_cur.execute(query,val)
                     
-                        bank_db.commit()
-                        
-                        
+                        bank_db.commit() 
+
+                        user.TransactionHistoryFeeder(result_id,repay_amount,'la',date)
+
                         print("\nCongratulations! Loan Amount Successfully added to your account")
                         print("\nThank you! for choosing us, Please pay your loan on time to avoid additional penalty charges")
                         print("\n-------------------------------------------------------------------------------------------------------------------------------")
@@ -529,6 +538,8 @@ class Bank:
         df = pd.DataFrame(res ,columns = columns)
 
         print("\n-------------------------------------------------------------------------------------------------------------------------------\n")
+
+        print("\nThe following status meaning are as follows: \nac - Account Creation \nla - Loan Approved \ncr - Credit \nd - Debit")
 
         print(df)
 
