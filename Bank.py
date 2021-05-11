@@ -269,7 +269,7 @@ class Bank:
                     date = str(dt.datetime.now()).split()[0]
         
                     
-                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_perioid) Values (%s,%s,%s,%s,%s,%s,%s)"
+                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period) Values (%s,%s,%s,%s,%s,%s,%s)"
                     val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration)
                     
                     bank_cur.execute(query,val)
@@ -316,7 +316,7 @@ class Bank:
                     
                         date = str(dt.datetime.now()).split()[0]
                     
-                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period) Values (%s,%s,%s,%s,%s,%s,%s)"
+                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period) Values (%s,%s,%s,%s,%s,%s,%s)"
                         val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration)
                     
                         bank_cur.execute(query,val)
@@ -509,7 +509,6 @@ class Bank:
             pass
 
     def TransactionHistoryFeeder(self,id,trans,trans_status,date):
-        
         query = "Insert into trans_history (User_id ,transaction ,trans_status, Date) Values(%s,%s,%s,%s)"
         val = (id ,trans ,trans_status ,date)
 
@@ -518,7 +517,6 @@ class Bank:
         bank_db.commit()
 
     def TransactionHistoryShower(self,pin):
-
         query = "Select User_id from Bank_Users where Pin = %s"
         val = (pin,)
         
@@ -542,6 +540,38 @@ class Bank:
         print("\nThe following status meaning are as follows: \nac - Account Creation \nla - Loan Approved \ncr - Credit \nd - Debit")
 
         print(df)
+
+    
+    def Pay_Loan(self,pin):
+        print("\n-------------------------------------------------------------------------------------------------------------------------------")
+
+        query = "Select User_id from Bank_Users where Pin = %s"
+        val = (pin,)
+
+        bank_cur.execute(query,val)
+        result_id = bank_cur.fetchall()
+
+        query = "Select EMI from Loan_Users where User_id = %s"
+        val = (result_id[0][0],)
+
+        bank_cur.execute(query,val)
+        result_EMI = bank_cur.fetchall()[0][0]
+
+        print("\n-------------------------------------------------------------------------------------------------------------------------------")
+        print(f"\nDo you want to pay the EMI i.e. {result_EMI} Rs through your Bank account or by deposting the money")
+
+        print("Type 'ba' for paying through Bank account or 'dm' for depositing money")
+
+        response = input("\n(ba/dm): ")
+
+        if response == 'ba':
+            print("You are paying from bank account")
+            #add withdraw query in this
+        elif response == 'dm':
+            print("You are paying by depositing money")
+            #add deposite query in this
+        else:
+            print("\nWrong Input")
 
   
         
@@ -573,7 +603,7 @@ while(res == 'y'):
     elif user_res == '2':
         print("\nServices: ")
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
-        print("\n1.Check Balance \n2.Deposite \n3.Withdaraw \n4.Pin Change \n5.Transaction History")
+        print("\n1.Check Balance \n2.Deposite \n3.Withdaraw \n4.Pin Change \n5.Transaction History \n6.Pay Loan")
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
         
         user_res1 = int(input("\nPlease Select Service: "))
@@ -598,6 +628,10 @@ while(res == 'y'):
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.TransactionHistoryShower(pin)
+        elif user_res1 == 6:
+            print("\n-------------------------------------------------------------------------------------------------------------------------------")
+            pin = input("\nPlease enter pin: ")
+            user.Pay_Loan(pin)
         else:
             print("\nIncorect Response ----- Please try again -------- Thank you!")
     
