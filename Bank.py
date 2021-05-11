@@ -276,7 +276,7 @@ class Bank:
                     
                     bank_db.commit()
 
-                    user.TransactionHistoryFeeder(result_id,repay_amount,'la',date)
+                    user.TransactionHistoryFeeder(result_id,self.loan_amount,'la',date)
                                    
                     
                     print("\nCongratulations! Loan Amount Successfully added to your account")
@@ -323,7 +323,7 @@ class Bank:
                     
                         bank_db.commit() 
 
-                        user.TransactionHistoryFeeder(result_id,repay_amount,'la',date)
+                        user.TransactionHistoryFeeder(result_id,self.loan_amount,'la',date)
 
                         print("\nCongratulations! Loan Amount Successfully added to your account")
                         print("\nThank you! for choosing us, Please pay your loan on time to avoid additional penalty charges")
