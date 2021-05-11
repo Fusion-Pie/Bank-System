@@ -269,8 +269,8 @@ class Bank:
                     date = str(dt.datetime.now()).split()[0]
         
                     
-                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period) Values (%s,%s,%s,%s,%s,%s)"
-                    val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration)
+                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_perioid) Values (%s,%s,%s,%s,%s,%s,%s)"
+                    val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration)
                     
                     bank_cur.execute(query,val)
                     
@@ -316,8 +316,8 @@ class Bank:
                     
                         date = str(dt.datetime.now()).split()[0]
                     
-                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period) Values (%s,%s,%s,%s,%s,%s)"
-                        val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration)
+                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period) Values (%s,%s,%s,%s,%s,%s,%s)"
+                        val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration)
                     
                         bank_cur.execute(query,val)
                     
