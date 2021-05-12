@@ -269,8 +269,8 @@ class Bank:
                     date = str(dt.datetime.now()).split()[0]
         
                     
-                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period) Values (%s,%s,%s,%s,%s,%s,%s)"
-                    val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration)
+                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed) Values (%s,%s,%s,%s,%s,%s,%s,%s)"
+                    val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0)
                     
                     bank_cur.execute(query,val)
                     
@@ -316,8 +316,8 @@ class Bank:
                     
                         date = str(dt.datetime.now()).split()[0]
                     
-                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period) Values (%s,%s,%s,%s,%s,%s,%s)"
-                        val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration)
+                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed) Values (%s,%s,%s,%s,%s,%s,%s,%s)"
+                        val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0)
                     
                         bank_cur.execute(query,val)
                     
@@ -537,7 +537,7 @@ class Bank:
 
         print("\n-------------------------------------------------------------------------------------------------------------------------------\n")
 
-        print("\nThe following status meaning are as follows: \nac - Account Creation \nla - Loan Approved \ncr - Credit \nd - Debit")
+        print("\nThe following status meaning are as follows: \nac - Account Creation \nla - Loan Approved \ncr - Credit \nd - Debit \nEMI - Equated Monthly Insatllment")
 
         print(df)
 
@@ -565,11 +565,27 @@ class Bank:
         response = input("\n(ba/dm): ")
 
         if response == 'ba':
-            print("You are paying from bank account")
-            #add withdraw query in this
+            print("\nYou are paying from bank account the amount will be decucted from your account")
+            
+            date = str(dt.datetime.now()).split()[0]
+
+            query = "Update Bank_Users set Balance = Balance - %s where Pin = %s"
+            val = (result_EMI,pin)
+
+            bank_cur.execute(query,val)
+
+            query = "Update Loan_Users set Amount_Repayed = %s , Remaining_Period = Remaining_Period - 1 where USer_id = %s"
+            val = (result_EMI ,result_id[0][0])
+
+            bank_cur.execute(query,val)
+
+            user.TransactionHistoryFeeder(result_id[0][0],result_EMI,"EMI",date)
+            bank_db.commit()
+
+            print("\nYou have paid your EMI")
+
         elif response == 'dm':
             print("You are paying by depositing money")
-            #add deposite query in this
         else:
             print("\nWrong Input")
 
@@ -606,29 +622,29 @@ while(res == 'y'):
         print("\n1.Check Balance \n2.Deposite \n3.Withdaraw \n4.Pin Change \n5.Transaction History \n6.Pay Loan")
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
         
-        user_res1 = int(input("\nPlease Select Service: "))
+        user_res1 = input("\nPlease Select Service: ")
         
-        if user_res1 == 1:
+        if user_res1 == '1':
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.CheckBalance(pin)
-        elif user_res1 == 2:
+        elif user_res1 == '2':
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.Deposit(pin)
-        elif user_res1 == 3:
+        elif user_res1 == '3':
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.WithDraw(pin)
-        elif user_res1 == 4:
+        elif user_res1 == '4':
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.PinChange(pin)
-        elif user_res1 == 5:
+        elif user_res1 == '5':
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.TransactionHistoryShower(pin)
-        elif user_res1 == 6:
+        elif user_res1 == '6':
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.Pay_Loan(pin)
