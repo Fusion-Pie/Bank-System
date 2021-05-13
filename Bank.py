@@ -269,8 +269,8 @@ class Bank:
                     date = str(dt.datetime.now()).split()[0]
         
                     
-                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed) Values (%s,%s,%s,%s,%s,%s,%s,%s)"
-                    val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0)
+                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed,Loan_Status) Values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                    val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0,"pending")
                     
                     bank_cur.execute(query,val)
                     
@@ -316,8 +316,8 @@ class Bank:
                     
                         date = str(dt.datetime.now()).split()[0]
                     
-                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed) Values (%s,%s,%s,%s,%s,%s,%s,%s)"
-                        val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0)
+                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed,Loan_Status) Values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                        val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0,'pending')
                     
                         bank_cur.execute(query,val)
                     
@@ -551,43 +551,67 @@ class Bank:
         bank_cur.execute(query,val)
         result_id = bank_cur.fetchall()
 
-        query = "Select EMI from Loan_Users where User_id = %s"
+        query = "Select EMI,Loan_Status,Remaining_Period from Loan_Users where User_id = %s"
         val = (result_id[0][0],)
 
         bank_cur.execute(query,val)
-        result_EMI = bank_cur.fetchall()[0][0]
+        result = bank_cur.fetchall()
 
-        print("\n-------------------------------------------------------------------------------------------------------------------------------")
-        print(f"\nDo you want to pay the EMI i.e. {result_EMI} Rs through your Bank account or by deposting the money")
+        result_EMI = result[0][0]
+        result_status = result[0][1]
+        resultRemainPeriod = result[0][2]
 
-        print("Type 'ba' for paying through Bank account or 'dm' for depositing money")
+        if result_status == 'pending' and resultRemainPeriod != 0: 
+            print("\n-------------------------------------------------------------------------------------------------------------------------------")
+            print(f"\nDo you want to pay the EMI i.e. {result_EMI} Rs through your Bank account or by deposting the money")
 
-        response = input("\n(ba/dm): ")
+            print("\nType 'ba' for paying through Bank account or 'dm' for depositing money")
 
-        if response == 'ba':
-            print("\nYou are paying from bank account the amount will be decucted from your account")
+            response = input("\n(ba/dm): ")
+
+            if response == 'ba':
+                print("\nYou are paying from bank account the amount will be decucted from your account")
             
-            date = str(dt.datetime.now()).split()[0]
+                date = str(dt.datetime.now()).split()[0]
 
-            query = "Update Bank_Users set Balance = Balance - %s where Pin = %s"
-            val = (result_EMI,pin)
+                query = "Update Bank_Users set Balance = Balance - %s where Pin = %s"
+                val = (result_EMI,pin)
 
-            bank_cur.execute(query,val)
+                bank_cur.execute(query,val)
 
-            query = "Update Loan_Users set Amount_Repayed = %s , Remaining_Period = Remaining_Period - 1 where USer_id = %s"
-            val = (result_EMI ,result_id[0][0])
+                query = "Update Loan_Users set Amount_Repayed = %s , Remaining_Period = Remaining_Period - 1 where USer_id = %s"
+                val = (result_EMI ,result_id[0][0])
 
-            bank_cur.execute(query,val)
+                bank_cur.execute(query,val)
 
-            user.TransactionHistoryFeeder(result_id[0][0],result_EMI,"EMI",date)
-            bank_db.commit()
+                user.TransactionHistoryFeeder(result_id[0][0],result_EMI,"EMI",date)
+                bank_db.commit()
 
-            print("\nYou have paid your EMI")
+                print("\nYou have paid your EMI")
 
-        elif response == 'dm':
-            print("You are paying by depositing money")
+            elif response == 'dm':
+                print("\nThis service is not avaialble, Please Deposite money in the account and then oay the EMI")
+            else:
+                print("\nWrong Input")
         else:
-            print("\nWrong Input")
+            print("\nYou do not have any active loan")
+
+    
+    def LoanCloser(self):
+        query = "Select * from Loan_Users where Remaining_Period = 0 and Loan_Status = 'pending'"
+
+        bank_cur.execute(query)
+        result = bank_cur.fetchall()
+
+        if len(result) != 0:
+            for i in range(len(result)):
+                query = "Update Loan_Users set Loan_Status = 'paid' where User_id = %s"
+                val = (result[i][0],)
+
+                bank_cur.execute(query,val)
+                bank_db.commit()
+        else:
+            pass
 
   
         
@@ -664,6 +688,7 @@ while(res == 'y'):
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
     
     user.CloseAccountDB()
+    user.LoanCloser()
     
     res = input("\nDo you want to continue(y/n): ")
     if res == 'n':

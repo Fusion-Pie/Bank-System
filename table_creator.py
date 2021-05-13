@@ -12,7 +12,7 @@ bank_cur.execute("Create table Bank_Users (User_id int AUTO_INCREMENT PRIMARY KE
 
 bank_cur.execute("Create table Complaints (Number int AUTO_INCREMENT PRIMARY KEY , Complaint Varchar(500))")
 
-bank_cur.execute("Create table Loan_Users (User_id int, Loan_approved int, EMI Varchar(15) , Total_repay_amount int, Loan_issue_date Varchar(15), Loan_Period int , Remaining_Period int , Amount_Repayed int)")
+bank_cur.execute("Create table Loan_Users (User_id int, Loan_approved int, EMI Varchar(15) , Total_repay_amount int, Loan_issue_date Varchar(15), Loan_Period int , Remaining_Period int , Amount_Repayed int , Loan_Status varchar(7))")
 
 bank_cur.execute("Create table Closed_Bank_Users (User_id int ,First_Name VARCHAR(100) ,Last_Name Varchar(100) ,Address Varchar(100) ,Mobile_No Varchar(20) , Card_no Varchar(16),Pin Varchar(6) ,Balance int , Opening_Date Varchar(15), Closed_Date Varchar(15), Acc_Status varchar(2))")
 
