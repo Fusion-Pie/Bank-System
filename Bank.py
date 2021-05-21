@@ -242,21 +242,10 @@ class Bank:
                 con = input("\nDo you have account in our bank(y/n): ")
                 if con == 'y':
                     print("\n-------------------------------------------------------------------------------------------------------------------------------")
+                    
                     pin = input("\nPlease enter your pin: ")
                     user.CheckPin(pin)
-                    
-                    print("\nYour loan is going to be in your account in a minute")
-                    
-                    query = "Update Bank_Users set Balance = Balance + %s where Pin = %s"
-                    val = (self.loan_amount,pin)
-                    
-                    bank_cur.execute(query,val)
-                    
-                    query = "Update Bank_Users set Balance = Balance - %s where User_id = 1"
-                    val = (self.loan_amount,)
-                    
-                    bank_cur.execute(query,val)
-                    
+
                     query = "Select User_id from Bank_Users where Pin = %s"
                     val = (pin,)
                     
@@ -264,25 +253,81 @@ class Bank:
                     
                     result_id = bank_cur.fetchall()
                     result_id = result_id[0][0]
-                    
-                    
-                    date = str(dt.datetime.now()).split()[0]
-        
-                    
-                    query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed,Loan_Status) Values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-                    val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0,"pending")
-                    
-                    bank_cur.execute(query,val)
-                    
-                    bank_db.commit()
 
-                    user.TransactionHistoryFeeder(result_id,self.loan_amount,'la',date)
-                                   
+                    query = "Select Loan_Status from Loan_Users where User_id = %s"
+                    val = (result_id,)
+
+                    bank_cur.execute(query,val)
+
+                    result_status = bank_cur.fetchall()
+
+                    if len(result_status) != 0:
+                        
+                        if result_status[0][0] == 'pending':
+                            print("\n-------------------------------------------------------------------------------------------------------------------------------")
+                            print("\nSorry, You have a Pending Laon. \nPlease clear the previous loan to get the benefit of new loan \nSorry for inconvinience")
+                            print("\n-------------------------------------------------------------------------------------------------------------------------------")
+                        
+                        else:
+                            print("\nYour loan is going to be in your account in a minute")
+                        
+                            query = "Update Bank_Users set Balance = Balance + %s where Pin = %s"
+                            val = (self.loan_amount,pin)
+                        
+                            bank_cur.execute(query,val)
+                        
+                            query = "Update Bank_Users set Balance = Balance - %s where User_id = 1"
+                            val = (self.loan_amount,)
+                        
+                            bank_cur.execute(query,val)
+                        
+                            date = str(dt.datetime.now()).split()[0]
+            
+                        
+                            query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed,Loan_Status) Values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                            val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0,"pending")
+                        
+                            bank_cur.execute(query,val)
+                        
+                            bank_db.commit()
+
+                            user.TransactionHistoryFeeder(result_id,self.loan_amount,'la',date)
+                                    
+                        
+                            print("\nCongratulations! Loan Amount Successfully added to your account")
+                            print("\nThank you! for choosing us, Please pay your loan on time to avoid additional penalty charges")
+                            print("\n-------------------------------------------------------------------------------------------------------------------------------")
                     
-                    print("\nCongratulations! Loan Amount Successfully added to your account")
-                    print("\nThank you! for choosing us, Please pay your loan on time to avoid additional penalty charges")
-                    print("\n-------------------------------------------------------------------------------------------------------------------------------")
+                    else:
+                        print("\nYour loan is going to be in your account in a minute")
+                        
+                        query = "Update Bank_Users set Balance = Balance + %s where Pin = %s"
+                        val = (self.loan_amount,pin)
                     
+                        bank_cur.execute(query,val)
+                    
+                        query = "Update Bank_Users set Balance = Balance - %s where User_id = 1"
+                        val = (self.loan_amount,)
+                        
+                        bank_cur.execute(query,val)
+                        
+                        date = str(dt.datetime.now()).split()[0]
+            
+                        
+                        query = "Insert into Loan_Users(User_id,Loan_approved,EMI,Total_repay_amount,Loan_issue_date,Loan_Period,Remaining_Period,Amount_Repayed,Loan_Status) Values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                        val = (result_id,self.loan_amount,EMI,repay_amount,date,self.loan_duration,self.loan_duration,0,"pending")
+                        
+                        bank_cur.execute(query,val)
+                    
+                        bank_db.commit()
+
+                        user.TransactionHistoryFeeder(result_id,self.loan_amount,'la',date)
+                                    
+                        print("\nCongratulations! Loan Amount Successfully added to your account")
+                        print("\nThank you! for choosing us, Please pay your loan on time to avoid additional penalty charges")
+                        print("\n-------------------------------------------------------------------------------------------------------------------------------")
+
+
                 elif con == 'n':
                     print("\n-------------------------------------------------------------------------------------------------------------------------------")
                     acc_res = input("\nDo you want to open account in our bank(y/n): ")
