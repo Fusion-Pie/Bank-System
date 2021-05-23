@@ -655,8 +655,41 @@ class Bank:
 
                 bank_cur.execute(query,val)
                 bank_db.commit()
+        
+    def TranserMoney(self):
+        print("\nYou can only transfer money to the person which is already using our services")
+
+        response_yn = input("\nDo you want to continue(y/n): ")
+
+        if response_yn == 'y':
+            cardNo_to_transfer = input("Please enter card: ")
+            
+            query = "Select First_name,Last_name from Bank_Users where Card_no = %s"
+            val = (cardNo_to_transfer,)
+
+            bank_cur.execute(query,val)
+            result_transer = bank_cur.fetchall()
+
+            if len(result_transer) != 0:
+                print("\nReceiver's Details are as follows \n(Please check the details to avoid future problems)")
+
+                print(f"\nFirst Name: {result_transer[0][0]} \nLast Name: {result_transer[0][1]}")
+
+                response_check = input("\nDo you want to continue(y/n): ")
+                
+                if response_check == 'y':
+                    print("You can continue")
+                elif response_check == 'n':
+                    print("\nThank You! for using our services")
+                    #Will do it later
+            else:
+                print("\nUser not fouond \n\nPlease check the card no. and try agrain")
+
+        elif response_yn == 'n':
+            print("\nThank You! for using our services")
+
         else:
-            pass
+            print("\nIncorrect Response")
 
   
         
@@ -688,7 +721,7 @@ while(res == 'y'):
     elif user_res == '2':
         print("\nServices: ")
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
-        print("\n1.Check Balance \n2.Deposite \n3.Withdaraw \n4.Pin Change \n5.Transaction History \n6.Pay Loan")
+        print("\n1.Check Balance \n2.Deposite \n3.Withdaraw \n4.Pin Change \n5.Transaction History \n6.Pay Loan \n7.Transfer Money")
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
         
         user_res1 = input("\nPlease Select Service: ")
@@ -717,6 +750,9 @@ while(res == 'y'):
             print("\n-------------------------------------------------------------------------------------------------------------------------------")
             pin = input("\nPlease enter pin: ")
             user.Pay_Loan(pin)
+        elif user_res1 == '7':
+            print("\n-------------------------------------------------------------------------------------------------------------------------------")
+            user.TranserMoney()
         else:
             print("\nIncorect Response ----- Please try again -------- Thank you!")
     
