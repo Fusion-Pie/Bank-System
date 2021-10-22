@@ -19,7 +19,7 @@ class Bank:
     def CreateUser(self):                                                      #Create New User
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
         
-        self.first_name = input("\nEnter First Name: ")
+        self.first_name = input("\nEnter Your First Name: ")
         self.last_name = input("Enter Last Name: ")
         self.mob_no = input("Enter Mobile No: ")
         self.address = input("Enter Address: ")
