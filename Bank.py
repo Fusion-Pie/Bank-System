@@ -20,7 +20,7 @@ class Bank:
         print("\n-------------------------------------------------------------------------------------------------------------------------------")
         
         self.first_name = input("\nEnter Your First Name: ")
-        self.last_name = input("Enter Last Name: ")
+        self.last_name = input("Enter your Last Name: ")
         self.mob_no = input("Enter Mobile No: ")
         self.address = input("Enter Address: ")
         self.pin = input("Enter Pin: ")
